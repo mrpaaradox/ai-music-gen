@@ -1,0 +1,90 @@
+# Default music generation configuration
+# DEFAULT_MUSIC_PROMPT = (
+#     "Global pop, Latin pop, tropical pop, romantic, smooth summer vibe, "
+#     "warm guitar, soft percussion, melodic vocals, emotional, radio hit"
+# )
+
+# DEFAULT_LYRICS = """[intro]
+# Mm… yeah
+# Slow lights, summer air
+
+# [verse]
+# We don't need words tonight,
+# Your eyes say more in silence,
+# Barefoot dancing in the dark,
+# Every step feels weightless.
+
+# City breathing, warm and low,
+# Moonlight on your shoulder,
+# Time moves slow when you're this close,
+# I just wanna hold ya.
+
+# [pre-chorus]
+# When you lean a little nearer,
+# Every doubt disappears,
+# Heartbeat sync, getting clearer,
+# This moment's all we hear.
+
+# [chorus]
+# Move slow, don't let go,
+# Feel the rhythm in your skin,
+# Every touch, every glow,
+# Pulls me deeper, pulls me in.
+
+# Say it soft, say it low,
+# Like a secret in my ear,
+# If tonight is all we own,
+# Let it last forever here.
+
+# [verse]
+# Ocean humming through the night,
+# Salt and neon colors,
+# Laughing like the world is light,
+# Nothing else can touch us.
+
+# Your shadow dancing next to mine,
+# Fire under water,
+# If this ends at sunrise time,
+# I'd still go a little farther.
+
+# [pre-chorus]
+# Every breath feels like a promise,
+# Every look feels true,
+# If the stars fall out of focus,
+# I still see you.
+
+# [chorus]
+# Move slow, don't let go,
+# Feel the rhythm in your skin,
+# Every touch, every glow,
+# Pulls me deeper, pulls me in.
+
+# Say it soft, say it low,
+# Like a secret in my ear,
+# If tonight is all we own,
+# Let it last forever here.
+
+# [bridge]
+# Close your eyes, count to three,
+# Let the night take over,
+# Lose the fear, come with me,
+# We don't need no closure.
+
+# Ooh… yeah
+# Right here, right now
+
+# [final chorus]
+# Move slow, don't let go,
+# Feel the rhythm when we breathe,
+# Every beat, every tone,
+# Feels like where we're meant to be.
+
+# Say it soft, say it low,
+# Even if it disappears,
+# If tonight is all we own,
+# Let it live forever here.
+
+# [outro]
+# Mm…
+# Forever here
+# """
