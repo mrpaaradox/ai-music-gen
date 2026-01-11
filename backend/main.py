@@ -22,6 +22,97 @@ hf_volume = modal.Volume.from_name("qwen-hf-cache", create_if_missing=True)
 
 music_gen_secrets = modal.Secret.from_name("music-gen-secret")
 
+# Default music generation configuration
+DEFAULT_MUSIC_PROMPT = (
+    "Global pop, Latin pop, tropical pop, romantic, smooth summer vibe, "
+    "warm guitar, soft percussion, melodic vocals, emotional, radio hit"
+)
+
+DEFAULT_LYRICS = """[intro]
+Mm… yeah
+Slow lights, summer air
+
+[verse]
+We don't need words tonight,
+Your eyes say more in silence,
+Barefoot dancing in the dark,
+Every step feels weightless.
+
+City breathing, warm and low,
+Moonlight on your shoulder,
+Time moves slow when you're this close,
+I just wanna hold ya.
+
+[pre-chorus]
+When you lean a little nearer,
+Every doubt disappears,
+Heartbeat sync, getting clearer,
+This moment's all we hear.
+
+[chorus]
+Move slow, don't let go,
+Feel the rhythm in your skin,
+Every touch, every glow,
+Pulls me deeper, pulls me in.
+
+Say it soft, say it low,
+Like a secret in my ear,
+If tonight is all we own,
+Let it last forever here.
+
+[verse]
+Ocean humming through the night,
+Salt and neon colors,
+Laughing like the world is light,
+Nothing else can touch us.
+
+Your shadow dancing next to mine,
+Fire under water,
+If this ends at sunrise time,
+I'd still go a little farther.
+
+[pre-chorus]
+Every breath feels like a promise,
+Every look feels true,
+If the stars fall out of focus,
+I still see you.
+
+[chorus]
+Move slow, don't let go,
+Feel the rhythm in your skin,
+Every touch, every glow,
+Pulls me deeper, pulls me in.
+
+Say it soft, say it low,
+Like a secret in my ear,
+If tonight is all we own,
+Let it last forever here.
+
+[bridge]
+Close your eyes, count to three,
+Let the night take over,
+Lose the fear, come with me,
+We don't need no closure.
+
+Ooh… yeah
+Right here, right now
+
+[final chorus]
+Move slow, don't let go,
+Feel the rhythm when we breathe,
+Every beat, every tone,
+Feels like where we're meant to be.
+
+Say it soft, say it low,
+Even if it disappears,
+If tonight is all we own,
+Let it live forever here.
+
+[outro]
+Mm…
+Forever here
+"""
+
 class GenerateMusicResponse(BaseModel):
     audio_data: str
 
@@ -70,9 +161,9 @@ class MusicGenServer:
         output_path = os.path.join(output_dir, f"{uuid.uuid4()}.wav")
 
         self.music_model(
-            prompt="Cuban music, salsa, son, Afro-Cuban, traditional Cuban",
-            lyrics= "[verse]\nWaves on the bass, pulsing in the speakers,\nTurn the dial up, we chasing six-figure features,\nGrinding on the beats, codes in the creases,\nDigital hustler, midnight in sneakers.\n\n[chorus]\nElectro vibes, hearts beat with the hum,\nUrban legends ride, we ain't ever numb,\nCircuits sparking live, tapping on the drum,\nLiving on the edge, never succumb.\n\n[verse]\nSynthesizers blaze, city lights a glow,\nRhythm in the haze, moving with the flow,\nSwagger on stage, energy to blow,\nFrom the blocks to the booth, you already know.\n\n[bridge]\nNight's electric, streets full of dreams,\nBass hits collective, bursting at seams,\nHustle perspective, all in the schemes,\nRise and reflective, ain't no in-betweens.\n\n[verse]\nVibin' with the crew, sync in the wire,\nGot the dance moves, fire in the attire,\nRhythm and blues, soul's our supplier,\nRun the digital zoo, higher and higher.\n\n[chorus]\nElectro vibes, hearts beat with the hum,\nUrban legends ride, we ain't ever numb,\nCircuits sparking live, tapping on the drum,\nLiving on the edge, never succumb.",
-            audio_duration = 208.27997916666666,
+            prompt="Global pop, Latin pop, tropical pop, romantic, smooth summer vibe, warm guitar, soft percussion, melodic vocals, emotional, radio hit",
+            lyrics= DEFAULT_LYRICS,
+            audio_duration = 180,
             infer_step = 60,
             guidance_scale = 15,
             save_path = output_path
