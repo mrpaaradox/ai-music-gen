@@ -277,13 +277,8 @@ def main():
         guidance_scale=15
     )
 
-    # Pass Headers by creating an object having Modal Keys
-    # headers={
-    # }
-
     payload = request_data.model_dump()
 
-    # headers = headers
     response = requests.post(endpoint_url, json=payload)
     response.raise_for_status()
     result = GenerateMusicResponseS3(**response.json())
