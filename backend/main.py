@@ -145,7 +145,16 @@ class MusicGenServer:
         return self.prompt_qwen(full_prompt)
 
     def generate_categories(self, description: str) -> List[str]:
-        prompt = f"Based on the following music description, list 3-5 relevant genres or categories as a comma-separated list. For example: Pop, Electronic, Sad, 80s. Description: '{description}'"
+        prompt = f"""Based on the following music description, list 3–5 relevant music genres or mood categories.
+                    Focus on Hindi/Bollywood-style music similar to Arijit Singh, Atif Aslam, or modern Indian film songs.
+                    Include emotional and melodic qualities.
+
+                    Return only a comma-separated list.
+
+                    Example outputs:
+                    Romantic, Soulful, Hindi Film, Acoustic
+                    Melancholic, Emotional, Bollywood Ballad
+                    Love, Soft Pop, Indian Contemporary Description: '{description}'"""
 
         response_text = self.prompt_qwen(prompt)
         categories = [cat.strip()
@@ -211,7 +220,7 @@ class MusicGenServer:
             categories=categories
         )
 
-    @modal.fastapi_endpoint(method="POST")
+    @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def generate(self) -> GenerateMusicResponse:
         output_dir = "/tmp/outputs"
         os.makedirs(output_dir, exist_ok=True)
@@ -233,7 +242,7 @@ class MusicGenServer:
         os.remove(output_path)
         return GenerateMusicResponse(audio_data=audio_b64)
 
-    @modal.fastapi_endpoint(method="POST")
+    @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def generate_from_description(self, request: GenerateFromDescriptionRequest) -> GenerateMusicResponseS3:
         # Generate a prompt
         prompt = self.generate_prompt(request.full_described_song)
@@ -244,31 +253,37 @@ class MusicGenServer:
             lyrics = self.generate_lyrics(request.full_described_song)
         return self.generate_and_upload_to_s3(prompt=prompt, lyrics=lyrics, description_for_categorization=request.full_described_song, **request.model_dump(exclude={"full_described_song"}))
 
-    @modal.fastapi_endpoint(method="POST")
+    @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def generate_with_lyrics(self, request: GenerateWithCustomLyricsRequest) -> GenerateMusicResponseS3:
-        return self.generate_and_upload_to_s3(prompt=request.prompt, lyrics=request.lyrics, description_for_categorization=request.prompt, **request.model_dump())
+        return self.generate_and_upload_to_s3(prompt=request.prompt, lyrics=request.lyrics, description_for_categorization=request.prompt, **request.model_dump(exclude={"prompt", "lyrics"}))
 
-    @modal.fastapi_endpoint(method="POST")
+    @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def generate_with_described_lyrics(self, request: GenerateWithDescribedLyricsRequest) -> GenerateMusicResponseS3:
         # Genere lyrics
         lyrics = ""
         if not request.instrumental:
             lyrics = self.generate_lyrics(request.described_lyrics)
-        return self.generate_and_upload_to_s3(prompt=request.prompt, lyrics=lyrics, description_for_categorization=request.prompt, **request.model_dump(exclude={"described_lyrics"}))
+        return self.generate_and_upload_to_s3(prompt=request.prompt, lyrics=lyrics, description_for_categorization=request.prompt, **request.model_dump(exclude={"described_lyrics", "prompt"}))
 
 
 @app.local_entrypoint()
 def main():
     server = MusicGenServer()
-    endpoint_url = server.generate_from_description.get_web_url()
+    endpoint_url = server.generate_with_described_lyrics.get_web_url()
 
-    request_data = GenerateFromDescriptionRequest(
-        full_described_song="Acoustic Ballad",
-        guidance_scale=7.5
+    request_data = GenerateWithDescribedLyricsRequest(
+        prompt="rave, funk, 140BPM, disco",
+        described_lyrics="lyrics about donald trump going foolish & idiot",
+        guidance_scale=15
     )
+
+    # Pass Headers by creating an object having Modal Keys
+    # headers={
+    # }
 
     payload = request_data.model_dump()
 
+    # headers = headers
     response = requests.post(endpoint_url, json=payload)
     response.raise_for_status()
     result = GenerateMusicResponseS3(**response.json())
