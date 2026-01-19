@@ -19,6 +19,7 @@ export default tseslint.config(
     ],
     rules: {
       "@typescript-eslint/array-type": "off",
+      "@typescript-esling/not-used": "off",
       "@typescript-eslint/consistent-type-definitions": "off",
       "@typescript-eslint/consistent-type-imports": [
         "warn",
