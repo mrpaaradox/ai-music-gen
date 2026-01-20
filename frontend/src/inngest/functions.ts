@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+ 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+ 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { db } from "~/server/db";
 import { inngest } from "./client";
@@ -33,9 +33,9 @@ export const generateSong = inngest.createFunction(
     };
 
     const { userId, credits, endpoint, body } = await step.run(
-      "check credits",
+      "check-credits",
       async () => {
-        const song = await db.song.findFirstOrThrow({
+        const song = await db.song.findUniqueOrThrow({
           where: {
             id: songId,
           },
@@ -51,7 +51,7 @@ export const generateSong = inngest.createFunction(
             fullDescribedSong: true,
             describedLyrics: true,
             instrumental: true,
-            gudianceScale: true,
+            guidanceScale: true,
             inferStep: true,
             audioDuration: true,
             seed: true,
@@ -74,9 +74,9 @@ export const generateSong = inngest.createFunction(
         let body: RequestBody = {};
 
         const commonParams = {
-          guidance_scale: song.gudianceScale ?? undefined,
+          guidance_scale: song.guidanceScale ?? undefined,
           infer_step: song.inferStep ?? undefined,
-          audioDuration: song.audioDuration ?? undefined,
+          audio_Duration: song.audioDuration ?? undefined,
           seed: song.seed ?? undefined,
           instrumental: song.instrumental ?? undefined,
         };
@@ -118,6 +118,7 @@ export const generateSong = inngest.createFunction(
         };
       },
     );
+
     if (credits > 0) {
       // generate the song
       await step.run("set-status-processing", async () => {
@@ -141,12 +142,12 @@ export const generateSong = inngest.createFunction(
         },
       });
 
-      await step.run("update-song-results", async () => {
+      await step.run("update-song-result", async () => {
         const responseData = response.ok
           ? ((await response.json()) as {
               s3_key: string;
               cover_image_s3_key: string;
-              categores: string[];
+              categories: string[];
             })
           : null;
 
@@ -161,14 +162,14 @@ export const generateSong = inngest.createFunction(
           },
         });
 
-        if (responseData && responseData?.categores.length > 0) {
+        if (responseData && responseData.categories.length > 0) {
           await db.song.update({
             where: {
               id: songId,
             },
             data: {
               categories: {
-                connectOrCreate: responseData.categores.map((categoryName) => ({
+                connectOrCreate: responseData.categories.map((categoryName) => ({
                   where: { name: categoryName },
                   create: { name: categoryName },
                 })),
