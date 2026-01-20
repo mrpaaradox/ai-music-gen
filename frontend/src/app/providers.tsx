@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 "use client";
 
 import { AuthUIProvider } from "@daveyplate/better-auth-ui";

@@ -1,21 +1,25 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { auth } from "~/lib/auth";
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
+import CreateSong from "~/components/create"
+import { auth } from "~/lib/auth"
 
-export default async function HomePage() {
+
+export default async function HomePage(){
+  
   const session = await auth.api.getSession({
-    headers: await headers()     
-  }) 
-
-  if (!session){
+    headers: await headers(),
+  })
+  
+  if(!session){
     redirect("/auth/sign-in")
   }
-
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <p>
-        Dashboard
-      </p>
-    </main>
-  );
+  
+  return(
+    <div
+    className="min-h-screen items-center flex flex-col justify-center"
+    >
+      <p>Dashboard</p>
+     <CreateSong />
+    </div>
+  )
 }
