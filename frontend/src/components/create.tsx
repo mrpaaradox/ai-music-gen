@@ -8,7 +8,7 @@ export default function CreateSong (){
         <Button
         onClick={queueSong}
         >
-            Generate Song
+            Create Song
         </Button>
     )
 }
