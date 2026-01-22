@@ -3,6 +3,7 @@ import modal
 import os
 import uuid
 import base64
+import subprocess
 from pydantic import BaseModel
 import requests
 import boto3
@@ -181,7 +182,7 @@ class MusicGenServer:
 
         output_dir = "/tmp/outputs"
         os.makedirs(output_dir, exist_ok=True)
-        output_path = os.path.join(output_dir, f"{uuid.uuid4()}.wav")
+        wav_path = os.path.join(output_dir, f"{uuid.uuid4()}.wav")
 
         self.music_model(
             prompt=prompt,
@@ -189,13 +190,26 @@ class MusicGenServer:
             audio_duration=audio_duration,
             infer_step=infer_step,
             guidance_scale=guidance_scale,
-            save_path=output_path,
+            save_path=wav_path,
             manual_seeds=str(seed)
         )
 
-        audio_s3_key = f"{uuid.uuid4()}.wav"
-        s3_client.upload_file(output_path, bucket_name, audio_s3_key)
-        os.remove(output_path)
+        # Convert WAV to MP4 (AAC codec) for smaller file size
+        mp4_path = os.path.join(output_dir, f"{uuid.uuid4()}.mp4")
+        subprocess.run([
+            "ffmpeg", "-i", wav_path,
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-y",
+            mp4_path
+        ], check=True, capture_output=True)
+
+        audio_s3_key = f"{uuid.uuid4()}.mp4"
+        s3_client.upload_file(mp4_path, bucket_name, audio_s3_key)
+        
+        # Clean up temporary files
+        os.remove(wav_path)
+        os.remove(mp4_path)
 
         # Thumbnail Generation
         thumbnail_prompt = f"{prompt}, album cover art"
@@ -224,7 +238,7 @@ class MusicGenServer:
     def generate(self) -> GenerateMusicResponse:
         output_dir = "/tmp/outputs"
         os.makedirs(output_dir, exist_ok=True)
-        output_path = os.path.join(output_dir, f"{uuid.uuid4()}.wav")
+        wav_path = os.path.join(output_dir, f"{uuid.uuid4()}.wav")
 
         self.music_model(
             prompt="Global pop, Latin pop, tropical pop, romantic, smooth summer vibe, warm guitar, soft percussion, melodic vocals, emotional, radio hit",
@@ -232,14 +246,28 @@ class MusicGenServer:
             audio_duration=180,
             infer_step=60,
             guidance_scale=15,
-            save_path=output_path
+            save_path=wav_path
         )
 
-        with open(output_path, "rb") as f:
+        # Convert WAV to MP4 (AAC codec) for smaller file size
+        mp4_path = os.path.join(output_dir, f"{uuid.uuid4()}.mp4")
+        subprocess.run([
+            "ffmpeg", "-i", wav_path,
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-y",
+            mp4_path
+        ], check=True, capture_output=True)
+
+        with open(mp4_path, "rb") as f:
             audio_bytes = f.read()
 
         audio_b64 = base64.b64encode(audio_bytes).decode("utf-8")
-        os.remove(output_path)
+        
+        # Clean up temporary files
+        os.remove(wav_path)
+        os.remove(mp4_path)
+        
         return GenerateMusicResponse(audio_data=audio_b64)
 
     @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
