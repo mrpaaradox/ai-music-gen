@@ -49,3 +49,29 @@ export async function renameSong(songId: string, newTitle: string) {
 
   revalidatePath("/create");
 }
+
+export async function deleteSong(songId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/auth/sign-in");
+  }
+
+  try {
+    // Delete the song - only if user owns it
+    await db.song.delete({
+      where: {
+        id: songId,
+        userId: session.user.id,
+      },
+    });
+
+    revalidatePath("/create");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting song:", error);
+    return { success: false, error: "Failed to delete song" };
+  }
+}

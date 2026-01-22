@@ -73,20 +73,19 @@ export function SongPanel(){
             return
         }
 
-        if (mode === "custom" && !styleInput.trim()){
-
-            if(!lyrics.trim() &&  lyricsMode === "auto"){
+        if (mode === "custom"){
+            // Lyrics are compulsory, check them first
+            if(!lyrics.trim() && lyricsMode === "auto"){
                 toast.error("Please describe your lyrics")
                 return
             }
 
-            if(!lyrics.trim() &&  lyricsMode === "write"){
+            if(!lyrics.trim() && lyricsMode === "write"){
                 toast.error("Please enter your lyrics")
                 return
             }
 
-            toast.error("Please add some styles for your song")
-            return
+            // Style is optional, no validation needed
         }
 
         // Generate Song

@@ -1,16 +1,18 @@
 "use client"
 
-import { Download, Loader2, MoreHorizontal, Music, Pencil, Play, RefreshCcw, Search, XCircle } from "lucide-react"
+import { Download, Loader2, MoreHorizontal, Music, Pencil, Play, RefreshCcw, Search, Trash2, XCircle } from "lucide-react"
 import { Input } from "../ui/input"
 import { useState } from "react"
 import { Button } from "../ui/button"
 import { getPlayUrl } from "~/actions/generation"
 import { Badge } from "../ui/badge"
-import { renameSong, setPublishedStatus } from "~/actions/songs"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { deleteSong, renameSong, setPublishedStatus } from "~/actions/songs"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { RenameDialog } from "./rename-dialog"
+import { DeleteDialog } from "./delete-dialog"
 import { useRouter } from "next/navigation"
 import { usePlayerStore } from "~/stores/use-player-store"
+import { toast } from "sonner"
 
 export interface Track {
     id: string,
@@ -35,6 +37,7 @@ export function TrackList({tracks}: {tracks: Track[]} ){
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null)
     const [trackToRename, setTrackToRename] = useState<Track | null>(null)
+    const [trackToDelete, setTrackToDelete] = useState<Track | null>(null)
     const router = useRouter()
     const setTrack = usePlayerStore((state) => state.setTrack)
 
@@ -59,6 +62,19 @@ export function TrackList({tracks}: {tracks: Track[]} ){
         setIsRefreshing(true)
         router.refresh()
         setTimeout(() => setIsRefreshing(false), 1000)
+    }
+
+    const handleDelete = async (trackId: string) => {
+        const result = await deleteSong(trackId)
+        
+        if (result.success) {
+            toast.success("Song deleted successfully")
+            router.refresh()
+        } else {
+            toast.error(result.error ?? "Failed to delete song")
+        }
+        
+        return result
     }
 
     const filteredTracks = tracks.filter((track) => track.title?.toLowerCase().includes(searchQuery.toLocaleLowerCase()) ?? track.prompts?.toLowerCase().includes(searchQuery.toLocaleLowerCase())) 
@@ -130,6 +146,17 @@ export function TrackList({tracks}: {tracks: Track[]} ){
                                                     Please try creating the song again.
                                                 </p>
                                             </div>
+                                            {/* Delete button for failed songs */}
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setTrackToDelete(track)
+                                                }}
+                                            >
+                                                <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                            </Button>
                                         </div>
                                     )
 
@@ -160,6 +187,17 @@ export function TrackList({tracks}: {tracks: Track[]} ){
                                                     Please purchase more credits to generate the song.
                                                 </p>
                                             </div>
+                                            {/* Delete button for no credits songs */}
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setTrackToDelete(track)
+                                                }}
+                                            >
+                                                <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                            </Button>
                                         </div>
                                     )
 
@@ -284,7 +322,8 @@ export function TrackList({tracks}: {tracks: Track[]} ){
                                                                 <Button
                                                                 variant={`ghost`}
                                                                 size={`icon`}
->
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                >
                                                                     <MoreHorizontal />
                                                                 </Button>
                                                             </DropdownMenuTrigger>
@@ -310,6 +349,18 @@ export function TrackList({tracks}: {tracks: Track[]} ){
                                                             }}
                                                             >
                                                                 <Pencil className="mr-2" /> Rename
+                                                            </DropdownMenuItem>
+
+                                                            <DropdownMenuSeparator />
+
+                                                            <DropdownMenuItem
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                setTrackToDelete(track)
+                                                            }}
+                                                            className="text-destructive focus:text-destructive"
+                                                            >
+                                                                <Trash2 className="mr-2" /> Delete
                                                             </DropdownMenuItem>
 
                                                             </DropdownMenuContent>
@@ -345,6 +396,14 @@ export function TrackList({tracks}: {tracks: Track[]} ){
                 track={trackToRename}
                 onClose={() => setTrackToRename(null)}
                 onRename={(trackId, newTitle) => renameSong(trackId, newTitle )}
+                />
+            )}
+
+            {trackToDelete && (
+                <DeleteDialog
+                track={trackToDelete}
+                onClose={() => setTrackToDelete(null)}
+                onDelete={handleDelete}
                 />
             )}
                         
