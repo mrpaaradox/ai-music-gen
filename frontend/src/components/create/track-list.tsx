@@ -10,6 +10,7 @@ import { renameSong, setPublishedStatus } from "~/actions/songs"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { RenameDialog } from "./rename-dialog"
 import { useRouter } from "next/navigation"
+import { usePlayerStore } from "~/stores/use-player-store"
 
 export interface Track {
     id: string,
@@ -35,17 +36,23 @@ export function TrackList({tracks}: {tracks: Track[]} ){
     const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null)
     const [trackToRename, setTrackToRename] = useState<Track | null>(null)
     const router = useRouter()
+    const setTrack = usePlayerStore((state) => state.setTrack)
 
     const handleTrackSelect = async(track: Track) => {
         if(loadingTrackId) return
         setLoadingTrackId(track.id)
         const playurl = await getPlayUrl(track.id)
         setLoadingTrackId(null)
-
-        console.log(playurl);
         
-
-        // Play the song in the playbar
+        setTrack({
+            id: track.id,
+            title: track.title,
+            url: playurl,
+            artwork: track.thumbnailUrl,
+            prompt: track.prompts,
+            createdByUsername: track.createdByUserName
+        })
+    
     }
 
     const handleRefresh = async() => {
