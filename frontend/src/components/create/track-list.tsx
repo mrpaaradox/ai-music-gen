@@ -239,10 +239,10 @@ export function TrackList({tracks}: {tracks: Track[]} ){
                                                 </div>
                                                     {/* Track Info */}
                                                     <div
-                                                    className="min-w-0 flex-1"
+                                                    className="min-w-0 flex-1 overflow-hidden"
                                                     >
                                                         <div
-                                                        className="flex items-center gap-2"
+                                                        className="flex items-center gap-2 overflow-hidden"
                                                         >
                                                             <h3
                                                             className="truncate text-sm font-medium"
@@ -252,12 +252,13 @@ export function TrackList({tracks}: {tracks: Track[]} ){
                                                             {track.instrumental && 
                                                             <Badge
                                                             variant={`outline`}
+                                                            className="shrink-0"
                                                             >
                                                                     Instrumental
                                                             </Badge>}
                                                         </div>
                                                         <p
-                                                        className="text-muted-foreground truncate text-xs"
+                                                        className="text-muted-foreground truncate text-xs max-w-xs"
                                                         >
                                                             {track.prompts}
                                                         </p>
@@ -265,7 +266,7 @@ export function TrackList({tracks}: {tracks: Track[]} ){
 
                                                     {/* Actions */}
                                                     <div
-                                                    className="flex items-center gap-2"
+                                                    className="flex shrink-0 items-center gap-2"
                                                     >   
                                                         <Button
                                                         onClick={async(e) =>  (
