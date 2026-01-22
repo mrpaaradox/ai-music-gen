@@ -13,8 +13,8 @@ export default function SoundBar(){
     const {track} = usePlayerStore()
     const [isPlaying, setIsPlaying] = useState(false)
     const [volume, setVolume] = useState([100])
-    const [currentTime, setCurrentTime] = useState(100)
-    const [duration, setDuration] = useState(100)
+    const [currentTime, setCurrentTime] = useState(0)
+    const [duration, setDuration] = useState(0)
     const audioRef = useRef<HTMLAudioElement>(null);
 
     useEffect(() => {
@@ -75,6 +75,12 @@ export default function SoundBar(){
         }
     },[track])
 
+    useEffect(() => {
+        if(audioRef.current){
+            audioRef.current.volume = volume[0]! / 100
+        }
+    },[volume])
+
     const togglePlay = async() => {
         if(!track?.url || !audioRef.current) return
         
@@ -101,6 +107,8 @@ export default function SoundBar(){
         return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
 
     }
+
+    if (!track)  return null
 
     return (
        <div
