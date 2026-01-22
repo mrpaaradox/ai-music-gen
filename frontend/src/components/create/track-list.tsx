@@ -267,7 +267,7 @@ export function TrackList({tracks}: {tracks: Track[]} ){
                                                         )}
                                                         variant={`outline`}
                                                         size={`sm`}
-                                                        className={`cursor-pointer ${track.published  ? "border-red-200" : ""}`}
+                                                        className={`cursor-pointer ${track.published  ? "border-orange-400" : ""}`}
                                                         >
                                                             {track.published ? "Unpublish" : "Publish"}
                                                         </Button>

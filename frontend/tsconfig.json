@@ -45,7 +45,7 @@
     "**/*.js",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
-  ],
+, "src/stores/use-player-store.ts"  ],
   "exclude": [
     "node_modules",
     "generated"
