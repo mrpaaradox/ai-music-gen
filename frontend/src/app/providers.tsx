@@ -4,10 +4,9 @@
 import { AuthUIProvider } from "@daveyplate/better-auth-ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
 import { authClient } from "~/lib/auth-client";
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   return (
@@ -16,9 +15,11 @@ export function Providers({ children }: { children: ReactNode }) {
       navigate={router.push}
       replace={router.replace}
       onSessionChange={() => {
-        // Clear router cache (protected routes)
         router.refresh();
       }}
+      account={{
+        basePath: "/dashboard" 
+    }}
       Link={Link}
     >
       {children}

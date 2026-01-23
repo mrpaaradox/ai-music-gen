@@ -2,6 +2,7 @@ import { Music } from "lucide-react"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { getPresignedUrl } from "~/actions/generation"
+import { SongCard } from "~/components/home/song-card"
 import { auth } from "~/lib/auth"
 import { db } from "~/server/db"
 
@@ -15,8 +16,6 @@ export default async function HomePage(){
   if(!session){
     redirect("/auth/sign-in")
   }
-
-  const userId = session.user.id
 
   const songs = await db.song.findMany(
     {
@@ -35,6 +34,11 @@ export default async function HomePage(){
           }
         },
         categories: true,
+        likes: session.user.id ?  {
+          where:{
+            userId: session.user.id
+          }
+        } : false
       },
       orderBy:{
         createdAt: "desc"
@@ -125,18 +129,45 @@ export default async function HomePage(){
             className="mt-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
             >
               {trendingSongs.map((song) => (
-                <p
-                key={song.id}
-                >
-                  {song.title}
-                </p>
-
+                <SongCard 
+                  key={song.id}
+                  song={{
+                    ...song,
+                    thumbnailUrl: song.thumbnailUrl
+                  }}
+                /> 
               ))}
             </div>
           </div>
         )
       }
 
+      {/* Categories */}
+      {Object.entries(categorizedSongs).slice(0,5).map(([category, songs]) => (
+        <div
+          key={category}
+          className="mt-6"
+        >
+          <h2
+            className="text-xl font-semibold"
+          >
+            {category}
+          </h2>
+          <div
+            className="mt-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+          >
+            {songs.map((song) => (
+              <SongCard 
+                key={song.id}
+                song={{
+                  ...song,
+                  thumbnailUrl: song.thumbnailUrl
+                }}
+              /> 
+            ))}
+          </div>
+        </div>
+      ))}
 
     </div>
   )
