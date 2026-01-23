@@ -7,7 +7,7 @@ import TrackListFetches from "~/components/create/track-list-fetcher"
 import { auth } from "~/lib/auth"
 
 
-export default async function HomePage(){
+export default async function Page(){
   
   const session = await auth.api.getSession({
     headers: await headers(),
