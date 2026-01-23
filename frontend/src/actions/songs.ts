@@ -75,3 +75,42 @@ export async function deleteSong(songId: string) {
     return { success: false, error: "Failed to delete song" };
   }
 }
+
+export async function toggleLikeSong(songId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/auth/sign-in");
+  }
+
+  const existingLike = await db.like.findUnique({
+    where: {
+      userId_songId: {
+        userId: session.user.id,
+        songId,
+      },
+    },
+  });
+
+  if (existingLike) {
+    await db.like.delete({
+      where: {
+        userId_songId: {
+          userId: session.user.id,
+          songId,
+        },
+      },
+    });
+  } else {
+    await db.like.create({
+      data: {
+        userId: session.user.id,
+        songId,
+      },
+    });
+  }
+
+  revalidatePath("/");
+}
