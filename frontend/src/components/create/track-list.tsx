@@ -1,6 +1,7 @@
 "use client"
 
 import { Download, Loader2, MoreHorizontal, Music, Pencil, Play, RefreshCcw, Search, Trash2, XCircle } from "lucide-react"
+import Image from "next/image"
 import { Input } from "../ui/input"
 import { useState } from "react"
 import { Button } from "../ui/button"
@@ -245,7 +246,13 @@ export function TrackList({tracks}: {tracks: Track[]} ){
                                                 >
                                                     {
                                                         track.thumbnailUrl ? (
-                                                            <img className="w-full h-full object-cover" src={track.thumbnailUrl} alt="images" />
+                                                            <Image
+                                                                className="object-cover"
+                                                                src={track.thumbnailUrl}
+                                                                alt={track.title ? `${track.title} thumbnail` : "Track thumbnail"}
+                                                                fill
+                                                                sizes="48px"
+                                                            />
                                                         )
                                                          : (
                                                             <>

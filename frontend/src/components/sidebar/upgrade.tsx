@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-
 "use client"
 
 import { authClient } from "~/lib/auth-client"
@@ -8,8 +5,10 @@ import { Button } from "../ui/button"
 
 export default function Upgrade(){
 
+    const checkout = authClient.checkout as (options: { products: string[] }) => Promise<unknown>
+
     const upgrade = async() => {
-        await authClient.checkout({
+        await checkout({
             products:[
                 "18477266-b079-417a-ac2c-d41555564a37",
                 "76a726dc-b47d-4f3b-a1b0-bc76b5240542",
