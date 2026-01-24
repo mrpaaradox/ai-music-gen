@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import CustomerPortalRedirect from "~/components/customer-portal-redirect";

@@ -1,6 +1,7 @@
 "use client"
 
 import { Download, MoreHorizontal, Music, Pause, Play, Volume2 } from "lucide-react"
+import Image from "next/image"
 import { usePlayerStore } from "~/stores/use-player-store"
 import { Card } from "./ui/card"
 import { Button } from "./ui/button"
@@ -130,7 +131,17 @@ export default function SoundBar(){
                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-orange-300 to-orange-500"
                         >
                             {
-                                track?.artwork ? <img className="h-full w-full rounded-md object-cover" src={track.artwork} alt="song image" /> : <Music className="text-white h-4 w-4"/>
+                                track?.artwork ? (
+                                    <Image
+                                    className="h-full w-full rounded-md object-cover"
+                                    src={track.artwork}
+                                    alt={track.title ? `${track.title} artwork` : "Track artwork"}
+                                    width={40}
+                                    height={40}
+                                    />
+                                ) : (
+                                    <Music className="text-white h-4 w-4"/>
+                                )
                             }
                         </div>
                             <div
